@@ -1,0 +1,55 @@
+<!--
+  Tomcat server.xml Configuration Snippets (/opt/tomcat/conf/server.xml)
+-->
+
+<!-- 1. Default HTTP Connector (Port 8080) -->
+<Connector port="8080" protocol="HTTP/1.1"
+           connectionTimeout="20000"
+           redirectPort="8443"
+           maxThreads="200"
+           minSpareThreads="25"
+           enableLookups="false"
+           acceptCount="100"
+           URIEncoding="UTF-8" />
+
+<!--
+  2. If using Nginx Reverse Proxy (SSL Termination at Nginx on Port 443 -> Forwarding to Tomcat 8080)
+  Add proxyName, proxyPort, and scheme to prevent redirect loops:
+-->
+<!--
+<Connector port="8080" protocol="HTTP/1.1"
+           proxyName="yourdomain.com"
+           proxyPort="443"
+           scheme="https"
+           secure="true"
+           connectionTimeout="20000"
+           URIEncoding="UTF-8" />
+-->
+
+<!--
+  3. Corresponding Nginx VirtualHost configuration snippet:
+  /etc/nginx/sites-available/sample-app
+-->
+<!--
+server {
+    listen 80;
+    server_name yourdomain.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name yourdomain.com;
+
+    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080/sample-app/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+-->

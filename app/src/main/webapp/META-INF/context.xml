@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tomcat Context Configuration with JNDI DataSource Resource.
+  This file can be placed at:
+    Option A (App specific): META-INF/context.xml inside the WAR
+    Option B (Host level):   /opt/tomcat/conf/Catalina/localhost/sample-app.xml
+    Option C (Global level): /opt/tomcat/conf/context.xml
+-->
+<Context>
+    <!-- Default session timeout and reload flags -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <WatchedResource>WEB-INF/tomcat-web.xml</WatchedResource>
+
+    <!-- PostgreSQL Connection Pool Resource Definition -->
+    <Resource name="jdbc/postgresDB"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              driverClassName="org.postgresql.Driver"
+              url="jdbc:postgresql://localhost:5432/appdb?sslmode=prefer"
+              username="appuser"
+              password="AppSecurePassword123!"
+              maxTotal="20"
+              maxIdle="10"
+              minIdle="2"
+              maxWaitMillis="10000"
+              testOnBorrow="true"
+              validationQuery="SELECT 1"
+              validationInterval="30000"
+              removeAbandoned="true"
+              removeAbandonedTimeout="60"
+              logAbandoned="true" />
+</Context>

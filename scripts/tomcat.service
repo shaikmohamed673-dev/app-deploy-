@@ -1,0 +1,41 @@
+# ============================================================================
+# Apache Tomcat systemd Service Unit File
+# Destination on Ubuntu: /etc/systemd/system/tomcat.service
+# ============================================================================
+
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=forking
+
+# Run as non-privileged system user 'tomcat'
+User=tomcat
+Group=tomcat
+
+# Environment variables
+# Adjust JAVA_HOME if using OpenJDK 21 or another path (check with: update-alternatives --list java)
+Environment="JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64"
+Environment="CATALINA_PID=/opt/tomcat/temp/tomcat.pid"
+Environment="CATALINA_HOME=/opt/tomcat"
+Environment="CATALINA_BASE=/opt/tomcat"
+Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseG1GC -Djava.awt.headless=true"
+Environment="JAVA_OPTS=-Djava.security.egd=file:/dev/./urandom"
+
+# Process management
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
+
+RestartSec=10
+Restart=always
+
+# Security hardening directives
+UMask=0027
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/tomcat/logs /opt/tomcat/temp /opt/tomcat/webapps /opt/tomcat/work
+
+[Install]
+WantedBy=multi-user.target
